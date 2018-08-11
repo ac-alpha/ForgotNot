@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -74,6 +76,8 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.NotifViewHol
         TextView dateTIme;
         TextView setReminder;
         TextView setOrNot;
+        public RelativeLayout viewBackground;
+        public LinearLayout viewForeground;
 
         public NotifViewHolder(View itemView) {
             super(itemView);
@@ -81,6 +85,8 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.NotifViewHol
             dateTIme = (TextView) itemView.findViewById(R.id.date_time);
             setReminder = (TextView) itemView.findViewById(R.id.set_reminder);
             setOrNot = (TextView) itemView.findViewById(R.id.set_or_not);
+            viewBackground = (RelativeLayout)itemView.findViewById(R.id.background_view);
+            viewForeground = (LinearLayout) itemView.findViewById(R.id.foreground_view);
             setReminder.setOnClickListener(this);
         }
 
