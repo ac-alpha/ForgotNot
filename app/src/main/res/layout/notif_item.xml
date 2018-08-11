@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="@drawable/rounded_background"
+    android:elevation="1dp"
+    android:layout_margin="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/notif_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text = "ECN102 Lecture"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:id="@+id/date_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text = "10th June 2018 - 8pm"
+                android:textColor="#cc000000"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/set_reminder"
+            android:layout_margin="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Reminder"
+            android:background="@drawable/green_button_bg"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:gravity="center"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:layout_weight="1"
+            android:elevation="4dp"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/set_or_not"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unnoticed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/red_button_bg"
+            android:textSize="15sp"
+            android:padding="8dp"
+            android:gravity="center"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:elevation="4dp"
+            android:clickable="true"/>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
