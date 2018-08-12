@@ -13,7 +13,7 @@ public class Constants {
     public static String REMINDER_UNNOTICED = "Unnoticed";
     public static int NOTIF_SHOW = 1;
     public static int NOTIF_HIDE = 0;
-    public static String KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS = "total_no_of_deleted_notif_items";
+    public static String KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS = "total_no_of_deleted_notif_items1";
 
     public class NotifEntry implements BaseColumns{
 

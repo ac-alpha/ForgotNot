@@ -12,7 +12,7 @@ import in.ashutoshchaubey.forgotnot.constants.Constants.NotifEntry;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "NotifList6";
+    private static final String DATABASE_NAME = "NotifList8";
     private static final int DATABASE_VERSION = 1;
 
     public static final String CREATE_TABLE_NOTIFS = "CREATE TABLE " + NotifEntry.TABLE_NAME + "("+

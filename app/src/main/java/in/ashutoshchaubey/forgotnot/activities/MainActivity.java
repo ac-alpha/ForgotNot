@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     private NotifAdapter notifAdapter;
     private LinearLayout rootLayout;
     private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         TextView textView = (TextView) findViewById(R.id.text);
         preferences = getApplicationContext()
                 .getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+        editor = preferences.edit();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notif_recycler_view);
         notifDbHelper = new DbHelper(this);
@@ -191,24 +193,31 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
         if (holder instanceof NotifAdapter.NotifViewHolder){
 
+//            int curr = preferences.getInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS,0);
+//            Log.e("Total del items", curr+"");
+//            editor.putInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS, curr+1);
+//            editor.apply();
+
             final int deleteIndex = holder.getAdapterPosition();
             final NotifItem deletedItem = notifList.get(deleteIndex);
             final String name = deletedItem.getTitle();
-            final Calendar cal = deletedItem.getReminderTime();
             notifAdapter.removeItem(deleteIndex);
 
             final ContentValues cv = new ContentValues();
             cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_HIDE);
-            db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry._ID+" = "+deleteIndex+1,null);
+            db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+name+"\"",null);
             cv.clear();
 
             Snackbar snackbar = Snackbar.make(rootLayout, "Item removed!!", Snackbar.LENGTH_SHORT);
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+//                    int curr = preferences.getInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS,0);
+//                    editor.putInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS, curr-1);
+//                    editor.apply();
                     notifAdapter.restoreItem(deleteIndex,deletedItem);
                     cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
-                    db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry._ID+" = "+deleteIndex+1,null);
+                    db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+name+"\"",null);
                     cv.clear();
                 }
             });
