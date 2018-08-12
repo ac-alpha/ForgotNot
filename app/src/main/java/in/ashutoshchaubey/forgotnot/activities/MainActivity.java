@@ -176,16 +176,43 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        Calendar tempCal = notifList.get(position).getReminderTime();
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", tempCal.getTimeInMillis());
-        intent.putExtra("allDay", false);
-        intent.putExtra("rrule", "FREQ=DAILY");
-        intent.putExtra("endTime", tempCal.getTimeInMillis()+60*60*1000);
-        intent.putExtra("title", notifList.get(position).getTitle());
-        startActivity(intent);
+    public void onItemClick(View view, final int position) {
+        final Calendar tempCal = notifList.get(position).getReminderTime();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Set Reminder?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        NotifItem item = notifList.get(position);
+                        ContentValues cv = new ContentValues();
+                        cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_SET);
+                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+item.getTitle()+"\"",null);
+                        cv.clear();
+                        Intent intent = new Intent(Intent.ACTION_EDIT);
+                        intent.setType("vnd.android.cursor.item/event");
+                        intent.putExtra("beginTime", tempCal.getTimeInMillis());
+                        intent.putExtra("allDay", false);
+                        intent.putExtra("rrule", "FREQ=DAILY");
+                        intent.putExtra("endTime", tempCal.getTimeInMillis()+60*60*1000);
+                        intent.putExtra("title", notifList.get(position).getTitle());
+                        startActivity(intent);
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        NotifItem item = notifList.get(position);
+                        ContentValues cv = new ContentValues();
+                        cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_UNSET);
+                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+item.getTitle()+"\"",null);
+                        cv.clear();
+
+                    }
+                }).create();
+        dialog.show();
     }
 
     @Override
