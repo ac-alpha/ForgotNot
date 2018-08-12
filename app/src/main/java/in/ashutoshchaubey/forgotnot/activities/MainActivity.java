@@ -7,14 +7,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,11 +31,13 @@ import in.ashutoshchaubey.forgotnot.constants.Constants;
 import in.ashutoshchaubey.forgotnot.helpers.DbHelper;
 import in.ashutoshchaubey.forgotnot.databaseandadapters.NotifAdapter;
 import in.ashutoshchaubey.forgotnot.databaseandadapters.NotifItem;
+import in.ashutoshchaubey.forgotnot.helpers.RecyclerItemTouchHelper;
+import in.ashutoshchaubey.forgotnot.helpers.RecyclerItemTouchHelperListener;
 import in.ashutoshchaubey.forgotnot.services.FnNotificationListenerService;
 
 import static in.ashutoshchaubey.forgotnot.services.FnNotificationListenerService.MY_PREFERENCES;
 
-public class MainActivity extends AppCompatActivity implements NotifAdapter.ItemClickListener{
+public class MainActivity extends AppCompatActivity implements NotifAdapter.ItemClickListener, RecyclerItemTouchHelperListener {
 
     private AlertDialog enableNotificationListenerAlertDialog;
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
@@ -38,11 +46,14 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     private DbHelper notifDbHelper;
     private ArrayList<NotifItem> notifList;
     private NotifAdapter notifAdapter;
+    private LinearLayout rootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        rootLayout = (LinearLayout) findViewById(R.id.root_layout);
 
         if(!isNotificationServiceEnabled()){
             enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
@@ -65,9 +76,15 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         fetchData();
         Log.e(FnNotificationListenerService.TAG, notifList.size()+"");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         notifAdapter = new NotifAdapter(this,notifList);
         notifAdapter.setClickListener(this);
         recyclerView.setAdapter(notifAdapter);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
 
     }
 
@@ -164,4 +181,27 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         startActivity(intent);
     }
 
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder holder, int direction, int position) {
+
+        if (holder instanceof NotifAdapter.NotifViewHolder){
+
+            final int deleteIndex = holder.getAdapterPosition();
+            final NotifItem deletedItem = notifList.get(deleteIndex);
+            String name = deletedItem.getTitle();
+            notifAdapter.removeItem(deleteIndex);
+
+            Snackbar snackbar = Snackbar.make(rootLayout, "Item removed!!", Snackbar.LENGTH_SHORT);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    notifAdapter.restoreItem(deleteIndex,deletedItem);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+
+        }
+
+    }
 }
