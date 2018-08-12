@@ -76,6 +76,7 @@ public class FnNotificationListenerService extends NotificationListenerService {
                     cv.put(NotifEntry.COLUMN_TIME_MIN, extractedData.get(Calendar.MINUTE));
                     cv.put(NotifEntry.COLUMN_TIME_AM_PM, extractedData.get(Calendar.AM_PM));
                     cv.put(NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_UNNOTICED);
+                    cv.put(NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
                     sqLiteDatabase.insert(NotifEntry.TABLE_NAME, null, cv);
                     cv.clear();
                     sqLiteDatabase.close();

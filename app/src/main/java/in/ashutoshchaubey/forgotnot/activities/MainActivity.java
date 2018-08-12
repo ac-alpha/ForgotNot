@@ -2,6 +2,7 @@ package in.ashutoshchaubey.forgotnot.activities;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     private ArrayList<NotifItem> notifList;
     private NotifAdapter notifAdapter;
     private LinearLayout rootLayout;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +65,16 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         }
 
         TextView textView = (TextView) findViewById(R.id.text);
-        SharedPreferences preferences = preferences = getApplicationContext()
+        preferences = getApplicationContext()
                 .getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notif_recycler_view);
         notifDbHelper = new DbHelper(this);
-        db = notifDbHelper.getReadableDatabase();
+        db = notifDbHelper.getWritableDatabase();
         notifList = new ArrayList<>();
-        notifList.add(new NotifItem("ECN 102 Lecture", Calendar.getInstance(), Constants.REMINDER_SET));
-        notifList.add(new NotifItem("Document Verification @ MAC", Calendar.getInstance(), Constants.REMINDER_UNSET));
-        notifList.add(new NotifItem("Fee Deposit", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
+//        notifList.add(new NotifItem("ECN 102 Lecture", Calendar.getInstance(), Constants.REMINDER_SET));
+//        notifList.add(new NotifItem("Document Verification @ MAC", Calendar.getInstance(), Constants.REMINDER_UNSET));
+//        notifList.add(new NotifItem("Fee Deposit", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
         fetchData();
         Log.e(FnNotificationListenerService.TAG, notifList.size()+"");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -147,19 +149,22 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         if (cursor != null && cursor.getCount() > 0) {
             if (cursor.moveToFirst()) {
                 do {
-
-                    NotifItem notifItem = new NotifItem();
-                    notifItem.setTitle(cursor.getString(1));
-                    Calendar time = Calendar.getInstance();
-                    time.set(Calendar.DATE, cursor.getInt(2));
-                    time.set(Calendar.MONTH, cursor.getInt(3));
-                    time.set(Calendar.YEAR, cursor.getInt(4));
-                    time.set(Calendar.HOUR, cursor.getInt(5));
-                    time.set(Calendar.MINUTE, cursor.getInt(6));
-                    time.set(Calendar.AM_PM, cursor.getInt(7));
-                    notifItem.setReminderTime(time);
-                    notifItem.setSetOrNot(cursor.getString(8));
-                    notifList.add(notifItem);
+                    Log.e(FnNotificationListenerService.TAG, cursor.getInt(9)+"");
+                    if (cursor.getInt(8) == Constants.NOTIF_SHOW) {
+                        NotifItem notifItem = new NotifItem();
+                        Log.e("Row ID",cursor.getInt(0)+"");
+                        notifItem.setTitle(cursor.getString(1));
+                        Calendar time = Calendar.getInstance();
+                        time.set(Calendar.DATE, cursor.getInt(2));
+                        time.set(Calendar.MONTH, cursor.getInt(3));
+                        time.set(Calendar.YEAR, cursor.getInt(4));
+                        time.set(Calendar.HOUR, cursor.getInt(5));
+                        time.set(Calendar.MINUTE, cursor.getInt(6));
+                        time.set(Calendar.AM_PM, cursor.getInt(7));
+                        notifItem.setReminderTime(time);
+                        notifItem.setSetOrNot(cursor.getString(9));
+                        notifList.add(notifItem);
+                    }
 
                 } while (cursor.moveToNext());
             }
@@ -188,14 +193,23 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
             final int deleteIndex = holder.getAdapterPosition();
             final NotifItem deletedItem = notifList.get(deleteIndex);
-            String name = deletedItem.getTitle();
+            final String name = deletedItem.getTitle();
+            final Calendar cal = deletedItem.getReminderTime();
             notifAdapter.removeItem(deleteIndex);
+
+            final ContentValues cv = new ContentValues();
+            cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_HIDE);
+            db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry._ID+" = "+deleteIndex+1,null);
+            cv.clear();
 
             Snackbar snackbar = Snackbar.make(rootLayout, "Item removed!!", Snackbar.LENGTH_SHORT);
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     notifAdapter.restoreItem(deleteIndex,deletedItem);
+                    cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
+                    db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry._ID+" = "+deleteIndex+1,null);
+                    cv.clear();
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);

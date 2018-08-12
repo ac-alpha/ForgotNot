@@ -34,7 +34,6 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:visibility="invisible"
         android:id="@+id/foreground_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

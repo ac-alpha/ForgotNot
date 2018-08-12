@@ -11,6 +11,9 @@ public class Constants {
     public static String REMINDER_SET = "Reminder Set";
     public static String REMINDER_UNSET = "Reminder Not Set";
     public static String REMINDER_UNNOTICED = "Unnoticed";
+    public static int NOTIF_SHOW = 1;
+    public static int NOTIF_HIDE = 0;
+    public static String KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS = "total_no_of_deleted_notif_items";
 
     public class NotifEntry implements BaseColumns{
 
@@ -24,6 +27,7 @@ public class Constants {
         public static final String COLUMN_TIME_MIN = "time_min";
         public static final String COLUMN_TIME_AM_PM = "time_am_pm";
         public static final String COLUMN_SET_UNSET = "set_unset";
+        public static final String COLUMN_SHOW = "show_notif_in_list";
 
     }
 

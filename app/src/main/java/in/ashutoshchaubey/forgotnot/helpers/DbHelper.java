@@ -12,7 +12,7 @@ import in.ashutoshchaubey.forgotnot.constants.Constants.NotifEntry;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "NotifList5";
+    private static final String DATABASE_NAME = "NotifList6";
     private static final int DATABASE_VERSION = 1;
 
     public static final String CREATE_TABLE_NOTIFS = "CREATE TABLE " + NotifEntry.TABLE_NAME + "("+
@@ -24,6 +24,7 @@ public class DbHelper extends SQLiteOpenHelper {
             NotifEntry.COLUMN_TIME_HR + " INTEGER, "+
             NotifEntry.COLUMN_TIME_MIN + " INTEGER, "+
             NotifEntry.COLUMN_TIME_AM_PM + " INTEGER, "+
+            NotifEntry.COLUMN_SHOW + " INTEGER, "+
             NotifEntry.COLUMN_SET_UNSET+" TEXT );";
 
     public DbHelper(Context context) {

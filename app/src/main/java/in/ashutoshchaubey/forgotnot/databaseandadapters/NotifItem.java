@@ -11,6 +11,7 @@ public class NotifItem {
     private String title;
     private Calendar reminderTime;
     private String setOrNot;
+    private boolean showOrNot = true;
 
     public NotifItem(){}
 
@@ -42,5 +43,13 @@ public class NotifItem {
 
     public void setSetOrNot(String setOrNot) {
         this.setOrNot = setOrNot;
+    }
+
+    public boolean getShowOrNot() {
+        return showOrNot;
+    }
+
+    public void setShowOrNot(boolean showOrNot) {
+        this.showOrNot = showOrNot;
     }
 }
