@@ -1,20 +1,14 @@
 package in.ashutoshchaubey.forgotnot.databaseandadapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import in.ashutoshchaubey.forgotnot.R;
@@ -44,8 +38,6 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.NotifViewHol
     @Override
     public void onBindViewHolder(NotifAdapter.NotifViewHolder holder, int position) {
         holder.notifTitle.setText(mData.get(position).getTitle());
-//        SimpleDateFormat sdf = new SimpleDateFormat("MMM MM dd, yyyy h:mm a");
-//        String dateString = sdf.format(mData.get(position).getReminderTime());
         holder.dateTIme.setText(String.format("%1$tA %1$tb %1$td %1$tY at %1$tI:%1$tM %1$Tp", mData.get(position).getReminderTime()));
         if (mData.get(position).getSetOrNot().equals(Constants.REMINDER_SET)) {
             holder.setOrNot.setBackgroundResource(R.drawable.green_button_bg);
@@ -57,10 +49,10 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.NotifViewHol
             holder.setOrNot.setBackgroundResource(R.drawable.red_button_bg);
             holder.setOrNot.setText(Constants.REMINDER_UNNOTICED);
         }
-        if (mData.get(position).getSetOrNot().equals(Constants.REMINDER_UNNOTICED)) {
-            holder.setReminder.setVisibility(View.VISIBLE);
-        } else {
+        if (mData.get(position).getSetOrNot().equals(Constants.REMINDER_SET)) {
             holder.setReminder.setVisibility(View.INVISIBLE);
+        } else {
+            holder.setReminder.setVisibility(View.VISIBLE);
         }
         holder.setOrNot.setElevation(12.0f);
         holder.setReminder.setElevation(12.0f);

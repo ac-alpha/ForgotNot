@@ -22,10 +22,8 @@ import in.ashutoshchaubey.forgotnot.constants.Constants.NotifEntry;
 
 public class FnNotificationListenerService extends NotificationListenerService {
 
-    String TAG = "SampleNLS";
+    String TAG = "NLS";
     public static final String MY_PREFERENCES = "MY_PREFERENCES";
-    public static final String MY_MAIL = "MY_MAIL";
-    int testValue;
 
 
     @Override
@@ -52,10 +50,7 @@ public class FnNotificationListenerService extends NotificationListenerService {
             String mailSubject = "";
             try {
                 mailSubject = extras.getCharSequence(Notification.EXTRA_TEXT).toString();
-
-//            Log.e(TAG, mainContent);
             } catch (NullPointerException e) {
-//            Log.e(TAG, e.getMessage());
             }
             try {
                 String mainBody = extras.getCharSequence(Notification.EXTRA_BIG_TEXT).toString();
@@ -82,10 +77,8 @@ public class FnNotificationListenerService extends NotificationListenerService {
                     sqLiteDatabase.close();
 
                 }
-//            Log.e(TAG, mainBody);
 
             } catch (NullPointerException e) {
-//            Log.e(TAG, e.getMessage());
             }
         }
 

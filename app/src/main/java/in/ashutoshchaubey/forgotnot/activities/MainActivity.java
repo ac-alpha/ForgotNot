@@ -78,13 +78,10 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
                 .getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         editor = preferences.edit();
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notif_recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notif_recycler_view);
         notifDbHelper = new DbHelper(this);
         db = notifDbHelper.getWritableDatabase();
-        notifList = new ArrayList<>();
-//        notifList.add(new NotifItem("ECN 102 Lecture", Calendar.getInstance(), Constants.REMINDER_SET));
-//        notifList.add(new NotifItem("Document Verification @ MAC", Calendar.getInstance(), Constants.REMINDER_UNSET));
-//        notifList.add(new NotifItem("Fee Deposit", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
+
         fetchData();
         Log.e(TAG, notifList.size()+"");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -100,7 +97,12 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         findViewById(R.id.refresh_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recreate();
+                fetchData();
+                recyclerView.setAdapter(null);
+                notifAdapter = new NotifAdapter(MainActivity.this,notifList);
+                notifAdapter.setClickListener(MainActivity.this);
+                recyclerView.setAdapter(notifAdapter);
+                notifAdapter.notifyDataSetChanged();
             }
         });
 
@@ -159,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     }
 
     private void fetchData(){
+
+        notifList = new ArrayList<>();
 
         Cursor cursor = db.query(Constants.NotifEntry.TABLE_NAME,null, null,
                 null, null, null, null);
@@ -256,9 +260,6 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    int curr = preferences.getInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS,0);
-//                    editor.putInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS, curr-1);
-//                    editor.apply();
                     notifAdapter.restoreItem(deleteIndex,deletedItem);
                     cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
                     db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+name+"\"",null);

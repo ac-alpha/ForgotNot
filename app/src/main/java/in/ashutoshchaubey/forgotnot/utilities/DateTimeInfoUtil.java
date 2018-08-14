@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class DateTimeInfoUtil {
 
-    private static String TAG = "DATETIMEINFOUTIL";
+    private static String TAG = "DateTimeInfoUtil";
     private static String[] timeRegex = new String[]{"[0-9]{1,2} *:?\\.? *[0-9]{0,2} *[AaMmPp]{2}", "[0-9]{1,2} *[oO] *\'? *[CLOCKclock]{5}"};
     private static String[] dateRegex = new String[]{"[0-9]{1,2} *[./-] *[0-9]{1,2} *[./-] *[0-9]{0,4}", "[0-9]{1,2} ?[a-zA-Z]{0,2} *[a-zA-Z]{3,9} *,? *[0-9]{0,4}"};
     private static ArrayList<String> months = new ArrayList<>(Arrays.asList(new DateFormatSymbols().getMonths()));
