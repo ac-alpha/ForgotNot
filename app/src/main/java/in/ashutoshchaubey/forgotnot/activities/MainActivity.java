@@ -255,11 +255,20 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
                         //If user presses Yes button
 
+                        //Getting the NotifItem associated with the clicked child
                         NotifItem item = notifList.get(position);
+
+                        //Making a ContentValues object to help update the table row
                         ContentValues cv = new ContentValues();
+
+                        //Updating the COLUMN_SET_UNSET field to REMINDER_SET
                         cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_SET);
                         db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + item.getTitle() + "\"", null);
+
+                        //clearing the ContentValues object after use
                         cv.clear();
+
+                        //Sending intent to the Calendar to add event
                         Intent intent = new Intent(Intent.ACTION_EDIT);
                         intent.setType("vnd.android.cursor.item/event");
                         intent.putExtra("beginTime", tempCal.getTimeInMillis());
@@ -275,11 +284,22 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        //If user presses No button
+
+                        //Getting the NotifItem associated with the clicked child
                         NotifItem item = notifList.get(position);
+
+                        //Making a ContentValues object to help update the table row
                         ContentValues cv = new ContentValues();
+
+                        //Updating the COLUMN_SET_UNSET field to REMINDER_UNSET
                         cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_UNSET);
                         db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + item.getTitle() + "\"", null);
+
+                        //clearing the ContentValues object after use
                         cv.clear();
+
+                        //Recreating the MainActivity to apply changes
                         recreate();
 
                     }
@@ -290,27 +310,45 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     @Override
     public void onSwiped(RecyclerView.ViewHolder holder, int direction, int position) {
 
+        //If a child is swiped
+
+        //If the child is instance of the ViewHolder of the RecyclerView
         if (holder instanceof NotifAdapter.NotifViewHolder) {
 
-//            int curr = preferences.getInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS,0);
-//            Log.e("Total del items", curr+"");
-//            editor.putInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS, curr+1);
-//            editor.apply();
-
+            //Index of the swiped child
             final int deleteIndex = holder.getAdapterPosition();
+
+            //NotifItem associated with the swiped child
             final NotifItem deletedItem = notifList.get(deleteIndex);
+
+            //Title of the swiped NotifItem
             final String name = deletedItem.getTitle();
+
+            //Removing the swiped index from adapter
             notifAdapter.removeItem(deleteIndex);
 
+            //Making ContentValues object to help update database row
             final ContentValues cv = new ContentValues();
+
+            //setting the value of COLUMN_SHOW field to be NOTIF_HIDE
             cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_HIDE);
+
+            //Updating the database
             db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + name + "\"", null);
+
+            //Clearing the ContentValues Object
             cv.clear();
 
+            //Creating a SnackBar to notify user that item has been removed
+            //and to give them option to UNDO their changes
             Snackbar snackbar = Snackbar.make(rootLayout, "Item removed!!", Snackbar.LENGTH_SHORT);
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    //If user wishes to undo his/her action
+
+                    //Restoring the index
                     notifAdapter.restoreItem(deleteIndex, deletedItem);
                     cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
                     db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + name + "\"", null);
@@ -326,9 +364,12 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
     @Override
     public void onBackPressed() {
+
+        //Open the Launcher Screen is back button is pressed
         Intent startMain = new Intent(Intent.ACTION_MAIN);
         startMain.addCategory(Intent.CATEGORY_HOME);
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
+
     }
 }
