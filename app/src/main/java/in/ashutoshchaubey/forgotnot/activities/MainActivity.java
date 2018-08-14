@@ -1,12 +1,10 @@
 package in.ashutoshchaubey.forgotnot.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -25,11 +23,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-
 import in.ashutoshchaubey.forgotnot.R;
 import in.ashutoshchaubey.forgotnot.constants.Constants;
 import in.ashutoshchaubey.forgotnot.helpers.DbHelper;
@@ -39,20 +35,36 @@ import in.ashutoshchaubey.forgotnot.helpers.RecyclerItemTouchHelper;
 import in.ashutoshchaubey.forgotnot.helpers.RecyclerItemTouchHelperListener;
 import in.ashutoshchaubey.forgotnot.services.FnNotificationListenerService;
 
-import static in.ashutoshchaubey.forgotnot.services.FnNotificationListenerService.MY_PREFERENCES;
 
 public class MainActivity extends AppCompatActivity implements NotifAdapter.ItemClickListener, RecyclerItemTouchHelperListener {
 
-    private AlertDialog enableNotificationListenerAlertDialog;
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
+
+    /*
+     * SQLite Database in which data about all incoming notifications are stored.
+     */
     private SQLiteDatabase db;
-    private DbHelper notifDbHelper;
+
+    /**
+     * ArrayList storing all the data selected from the database in form of NotifItem
+     * to populate in the RecyclerView.Adapter
+     */
     private ArrayList<NotifItem> notifList;
+
+    /**
+     * Adapter for the RecyclerView
+     */
     private NotifAdapter notifAdapter;
+
+    /**
+     * Root Layout of the main activity (from the bottom of which the SnackBar should reveal)
+     */
     private LinearLayout rootLayout;
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
+
+    /**
+     * TAG for Logging
+     */
     String TAG = "MainActivity";
 
     @Override
@@ -60,46 +72,71 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Typeface lobster = Typeface.createFromAsset(getApplication().getAssets(), "fonts/kaushan.otf");
-        TextView toolbarText = (TextView) findViewById(R.id.toolbar);
-        toolbarText.setTypeface(lobster);
+        //Fetching the TypeFace from assets
+        Typeface kaushan = Typeface.createFromAsset(getApplication().getAssets(), "fonts/kaushan.otf");
 
+        //Setting the Typeface of the toolbar text as kaushan
+        TextView toolbarText = (TextView) findViewById(R.id.toolbar);
+        toolbarText.setTypeface(kaushan);
+
+        //Fetching the root layout from the xml
         rootLayout = (LinearLayout) findViewById(R.id.root_layout);
 
-        if(!isNotificationServiceEnabled()){
-            enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
+        //Checking if the notification service is enabled.
+        //If enabled, then starting the service immediately (ignored if already started)
+        //If not, then asking the user to enable the service
+        if (!isNotificationServiceEnabled()) {
+            AlertDialog enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
             enableNotificationListenerAlertDialog.show();
-        }else{
+        } else {
             startService(new Intent(MainActivity.this, FnNotificationListenerService.class));
         }
 
-        TextView textView = (TextView) findViewById(R.id.text);
-        preferences = getApplicationContext()
-                .getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-        editor = preferences.edit();
-
+        //Fetching the RecyclerView from xml
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notif_recycler_view);
-        notifDbHelper = new DbHelper(this);
+
+        //Getting the database associated with the app with the help of DbHelper class instance
+        DbHelper notifDbHelper = new DbHelper(this);
         db = notifDbHelper.getWritableDatabase();
 
+        //populating the notifList from database
         fetchData();
-        Log.e(TAG, notifList.size()+"");
+
+        //setting the LayoutManager to LinearLayout manager for populating the
+        //items in form of a linear list
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //setting the animation of addition/deletion of items in the RecyclerView
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        //setting the divider between two childs of the RecyclerView
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        notifAdapter = new NotifAdapter(this,notifList);
+
+        //Adapter for the RecyclerView
+        notifAdapter = new NotifAdapter(this, notifList);
+
+        //setting ClickListener for the Adapter
         notifAdapter.setClickListener(this);
+
+        //setting Adapter to the RecyclerView
         recyclerView.setAdapter(notifAdapter);
 
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
+        //setting callback to give response swipe to delete functionality
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        //attaching the ItemTouchHelper to the RecyclerView
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
+        //setting ClickListener to the refresh button on Toolbar
         findViewById(R.id.refresh_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //repopulating the notigList to add any changes
                 fetchData();
+
+                //removing the adapter the re-setting it with new data
                 recyclerView.setAdapter(null);
-                notifAdapter = new NotifAdapter(MainActivity.this,notifList);
+                notifAdapter = new NotifAdapter(MainActivity.this, notifList);
                 notifAdapter.setClickListener(MainActivity.this);
                 recyclerView.setAdapter(notifAdapter);
                 notifAdapter.notifyDataSetChanged();
@@ -113,9 +150,10 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
      * Is Notification Service Enabled.
      * Verifies if the notification listener service is enabled.
      * Got it from: https://github.com/kpbird/NotificationListenerService-Example/blob/master/NLSExample/src/main/java/com/kpbird/nlsexample/NLService.java
+     *
      * @return True if enabled, false otherwise.
      */
-    private boolean isNotificationServiceEnabled(){
+    private boolean isNotificationServiceEnabled() {
         String pkgName = getPackageName();
         final String flat = Settings.Secure.getString(getContentResolver(),
                 ENABLED_NOTIFICATION_LISTENERS);
@@ -138,9 +176,10 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
      * Build Notification Listener Alert Dialog.
      * Builds the alert dialog that pops up if the user has not turned
      * the Notification Listener Service on yet.
+     *
      * @return An alert dialog which leads to the notification enabling screen
      */
-    private AlertDialog buildNotificationServiceAlertDialog(){
+    private AlertDialog buildNotificationServiceAlertDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Notification Listener Service");
         alertDialogBuilder.setMessage("For the the app. to work you need to enable the Notification Listener Service. Enable it now?");
@@ -157,22 +196,27 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
                         // the app. will not work as expected
                     }
                 });
-        return(alertDialogBuilder.create());
+        return (alertDialogBuilder.create());
     }
 
-    private void fetchData(){
+    /**
+     * Fetches the data of all the notifications inserted in the
+     * database and populates them into the notifList
+     */
+    private void fetchData() {
 
         notifList = new ArrayList<>();
 
-        Cursor cursor = db.query(Constants.NotifEntry.TABLE_NAME,null, null,
+        //Creating cursor to make query to database
+        Cursor cursor = db.query(Constants.NotifEntry.TABLE_NAME, null, null,
                 null, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             if (cursor.moveToFirst()) {
                 do {
-                    Log.e(TAG, cursor.getInt(9)+"");
+                    //If the showOrNot Column is SHOW then only add it to the notifList
                     if (cursor.getInt(8) == Constants.NOTIF_SHOW) {
                         NotifItem notifItem = new NotifItem();
-                        Log.e("Row ID",cursor.getInt(0)+"");
+                        Log.e("Row ID", cursor.getInt(0) + "");
                         notifItem.setTitle(cursor.getString(1));
                         Calendar time = Calendar.getInstance();
                         time.set(Calendar.DATE, cursor.getInt(2));
@@ -191,30 +235,37 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
             cursor.close();
         }
 
+        //reversing the notifList so that the latest data remains at the top
         Collections.reverse(notifList);
 
     }
 
     @Override
     public void onItemClick(View view, final int position) {
+
+        //setting the tempCal to the calendar time of the currently clicked item
         final Calendar tempCal = notifList.get(position).getReminderTime();
+
+        //Building a new AlertDialog to ask user whether he really wants to set a reminder
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Set Reminder?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        //If user presses Yes button
+
                         NotifItem item = notifList.get(position);
                         ContentValues cv = new ContentValues();
                         cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_SET);
-                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+item.getTitle()+"\"",null);
+                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + item.getTitle() + "\"", null);
                         cv.clear();
                         Intent intent = new Intent(Intent.ACTION_EDIT);
                         intent.setType("vnd.android.cursor.item/event");
                         intent.putExtra("beginTime", tempCal.getTimeInMillis());
                         intent.putExtra("allDay", false);
                         intent.putExtra("rrule", "FREQ=DAILY");
-                        intent.putExtra("endTime", tempCal.getTimeInMillis()+60*60*1000);
+                        intent.putExtra("endTime", tempCal.getTimeInMillis() + 60 * 60 * 1000);
                         intent.putExtra("title", notifList.get(position).getTitle());
                         startActivity(intent);
 
@@ -227,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
                         NotifItem item = notifList.get(position);
                         ContentValues cv = new ContentValues();
                         cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_UNSET);
-                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+item.getTitle()+"\"",null);
+                        db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + item.getTitle() + "\"", null);
                         cv.clear();
                         recreate();
 
@@ -239,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     @Override
     public void onSwiped(RecyclerView.ViewHolder holder, int direction, int position) {
 
-        if (holder instanceof NotifAdapter.NotifViewHolder){
+        if (holder instanceof NotifAdapter.NotifViewHolder) {
 
 //            int curr = preferences.getInt(Constants.KEY_TOTAL_NO_OF_DELETED_NOTIFITEMS,0);
 //            Log.e("Total del items", curr+"");
@@ -253,16 +304,16 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
             final ContentValues cv = new ContentValues();
             cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_HIDE);
-            db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+name+"\"",null);
+            db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + name + "\"", null);
             cv.clear();
 
             Snackbar snackbar = Snackbar.make(rootLayout, "Item removed!!", Snackbar.LENGTH_SHORT);
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    notifAdapter.restoreItem(deleteIndex,deletedItem);
+                    notifAdapter.restoreItem(deleteIndex, deletedItem);
                     cv.put(Constants.NotifEntry.COLUMN_SHOW, Constants.NOTIF_SHOW);
-                    db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+name+"\"",null);
+                    db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME + " = \"" + name + "\"", null);
                     cv.clear();
                 }
             });
