@@ -1,5 +1,6 @@
 package in.ashutoshchaubey.forgotnot.activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 
 import in.ashutoshchaubey.forgotnot.R;
 import in.ashutoshchaubey.forgotnot.constants.Constants;
@@ -50,11 +53,16 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     private LinearLayout rootLayout;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+    String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Typeface lobster = Typeface.createFromAsset(getApplication().getAssets(), "fonts/kaushan.otf");
+        TextView toolbarText = (TextView) findViewById(R.id.toolbar);
+        toolbarText.setTypeface(lobster);
 
         rootLayout = (LinearLayout) findViewById(R.id.root_layout);
 
@@ -78,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 //        notifList.add(new NotifItem("Document Verification @ MAC", Calendar.getInstance(), Constants.REMINDER_UNSET));
 //        notifList.add(new NotifItem("Fee Deposit", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
         fetchData();
-        Log.e(FnNotificationListenerService.TAG, notifList.size()+"");
+        Log.e(TAG, notifList.size()+"");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -89,6 +97,12 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,ItemTouchHelper.LEFT,this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
+        findViewById(R.id.refresh_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recreate();
+            }
+        });
 
     }
 
@@ -151,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
         if (cursor != null && cursor.getCount() > 0) {
             if (cursor.moveToFirst()) {
                 do {
-                    Log.e(FnNotificationListenerService.TAG, cursor.getInt(9)+"");
+                    Log.e(TAG, cursor.getInt(9)+"");
                     if (cursor.getInt(8) == Constants.NOTIF_SHOW) {
                         NotifItem notifItem = new NotifItem();
                         Log.e("Row ID",cursor.getInt(0)+"");
@@ -172,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
             }
             cursor.close();
         }
+
+        Collections.reverse(notifList);
 
     }
 
@@ -209,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
                         cv.put(Constants.NotifEntry.COLUMN_SET_UNSET, Constants.REMINDER_UNSET);
                         db.update(Constants.NotifEntry.TABLE_NAME, cv, Constants.NotifEntry.COLUMN_EVENT_NAME+" = \""+item.getTitle()+"\"",null);
                         cv.clear();
+                        recreate();
 
                     }
                 }).create();
@@ -253,5 +270,13 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
 
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }

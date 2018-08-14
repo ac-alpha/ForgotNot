@@ -22,7 +22,7 @@ import in.ashutoshchaubey.forgotnot.constants.Constants.NotifEntry;
 
 public class FnNotificationListenerService extends NotificationListenerService {
 
-    public static final String TAG = "SampleNLS";
+    String TAG = "SampleNLS";
     public static final String MY_PREFERENCES = "MY_PREFERENCES";
     public static final String MY_MAIL = "MY_MAIL";
     int testValue;
@@ -42,7 +42,7 @@ public class FnNotificationListenerService extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
 
-
+        Log.i(TAG, "onNotificationPosted");
 
         if(sbn.getPackageName().equals("com.google.android.gm")) {
 
