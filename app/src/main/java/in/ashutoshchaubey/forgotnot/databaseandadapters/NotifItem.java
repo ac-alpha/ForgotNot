@@ -8,9 +8,26 @@ import java.util.Calendar;
 
 public class NotifItem {
 
+    /**
+     * Contains the title of the reminder which is basically
+     * the subject of the mail from which it is extracted
+     */
     private String title;
+
+    /**
+     * Time extracted from the email, at which the event will occur
+     */
     private Calendar reminderTime;
+
+    /**
+     * Field depicting whether the reminder is set or not
+     */
     private String setOrNot;
+
+    /**
+     * Field deciding whether the NotifItem should be displayed
+     * or not (as the user might have swiped it out)
+     */
     private boolean showOrNot = true;
 
     public NotifItem(){}

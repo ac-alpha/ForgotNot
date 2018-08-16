@@ -22,9 +22,8 @@ import in.ashutoshchaubey.forgotnot.constants.Constants.NotifEntry;
 
 public class FnNotificationListenerService extends NotificationListenerService {
 
+    //TAG for debugging purposes
     String TAG = "NLS";
-    public static final String MY_PREFERENCES = "MY_PREFERENCES";
-
 
     @Override
     public void onCreate() {
@@ -42,13 +41,17 @@ public class FnNotificationListenerService extends NotificationListenerService {
 
         Log.i(TAG, "onNotificationPosted");
 
+        //Only extract information from the gmail notifications
         if(sbn.getPackageName().equals("com.google.android.gm")) {
 
-
+            //getting the posted Notification
             Notification notification = sbn.getNotification();
+
+            //extracting the Bundle extras from the notification
             Bundle extras = notification.extras;
             String mailSubject = "";
             try {
+                //Getting mail Subject
                 mailSubject = extras.getCharSequence(Notification.EXTRA_TEXT).toString();
             } catch (NullPointerException e) {
             }
@@ -56,12 +59,16 @@ public class FnNotificationListenerService extends NotificationListenerService {
                 String mainBody = extras.getCharSequence(Notification.EXTRA_BIG_TEXT).toString();
                 if (DateTimeInfoUtil.findDate(mainBody) || DateTimeInfoUtil.findTime(mainBody)) {
 
-
+                    //Creating DbHelper object to help insert data into the database
                     DbHelper notifDbHelper = new DbHelper(this);
+
+                    //Database in which data is to be inserted
                     SQLiteDatabase sqLiteDatabase = notifDbHelper.getWritableDatabase();
 
+                    //Extracted date and time
                     Calendar extractedData = DateTimeInfoUtil.extractDateTime(mainBody);
-                    Log.e(TAG, extractedData.get(Calendar.YEAR)+"");
+
+                    //ContentValues object to format data in order to insert into database
                     ContentValues cv = new ContentValues();
                     cv.put(NotifEntry.COLUMN_EVENT_NAME, mailSubject);
                     cv.put(NotifEntry.COLUMN_DATE_DD, extractedData.get(Calendar.DAY_OF_MONTH));
@@ -86,7 +93,6 @@ public class FnNotificationListenerService extends NotificationListenerService {
 
     @Override
     public boolean stopService(Intent name) {
-        Log.e(TAG, "Service stopped :(");
         return super.stopService(name);
     }
 
