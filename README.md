@@ -87,6 +87,6 @@ Please donate if you find this repository nice.
 
 ## License
 
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://badges.mit-license.org)
 
-- **[MIT license](http://opensource.org/licenses/mit-license.php)**
+This repository is licenced under **[MIT license](http://opensource.org/licenses/mit-license.php)**
