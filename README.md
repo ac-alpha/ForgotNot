@@ -1,9 +1,28 @@
+> “How did it get so late so soon?” 
+― Dr. Seuss
 
-<img src="https://github.com/ac-alpha/ForgotNot/blob/master/app/src/main/res/drawable/ic_app.png" align="middle" width="100px"/>
+# <div align="center"> <img src="https://github.com/ac-alpha/ForgotNot/blob/master/app/src/main/res/drawable/ic_app.png" width="100px"/> <br> ForgotNot </div>
 
-# ForgotNot
+<div align="center">
+	<a href="https://www.android.com">
+    <img src="https://img.shields.io/badge/platform-Android-blue.svg"
+      alt="Platform" />
+  </a>
+	<a href="https://android-arsenal.com/api?level=21">
+    <img src="https://img.shields.io/badge/API-21%2B-lightgrey.svg?style=flat"
+      alt="API" />
+  </a>
+	<a href="https://github.com/ac-alpha/ForgotNot/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-orange.svg"
+      alt="License: MIT" />
+  </a>
+  <a href="https://travis-ci.com/ac-alpha/ForgotNot">
+    <img src="https://travis-ci.com/ac-alpha/ForgotNot.svg?token=tJqhbYs6pas7vKLQJn6U&branch=master"
+      alt="Build Status" />
+  </a>
+</div><br>
 
-> Android App to extract date/time related info from gmail and set reminders for them
+Android App to extract date/time related info from gmail and set reminders for them. The extracted date and time info are rendered in a very user friendly manner which allows the users to set a reminder instantly.
 
 <img src="https://github.com/ac-alpha/ForgotNot/blob/master/ForgotNot%20Sample.png" width="400px"/>
 
