@@ -1,5 +1,7 @@
+
 > “How did it get so late so soon?” 
 ― Dr. Seuss
+
 
 # <div align="center"> <img src="https://github.com/ac-alpha/ForgotNot/blob/master/app/src/main/res/drawable/ic_app.png" width="100px"/> <br> ForgotNot </div>
 
@@ -24,7 +26,9 @@
 
 Android App to extract date/time related info from gmail and set reminders for them. The extracted date and time info are rendered in a very user friendly manner which allows the users to set a reminder instantly.
 
-<img src="https://github.com/ac-alpha/ForgotNot/blob/master/ForgotNot%20Sample.png" width="400px"/>
+<div align="center">
+<img src="https://github.com/ac-alpha/ForgotNot/blob/master/ForgotNot%20Sample.png" width="325px"/>
+</div>
 
 - Most people will glance at your `README`, *maybe* star it, and leave
 - Ergo, people should understand instantly what your project is about based on your repo
