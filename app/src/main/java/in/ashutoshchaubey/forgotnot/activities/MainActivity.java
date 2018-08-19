@@ -206,11 +206,11 @@ public class MainActivity extends AppCompatActivity implements NotifAdapter.Item
     private void fetchData() {
 
         notifList = new ArrayList<>();
-
-        notifList.add(new NotifItem("ECN102 Lecture", Calendar.getInstance(), Constants.REMINDER_SET));
-        notifList.add(new NotifItem("Subject Addition/Deletion Form Submission", Calendar.getInstance(), Constants.REMINDER_UNSET));
-        notifList.add(new NotifItem("NSS Meeting", Calendar.getInstance(), Constants.REMINDER_SET));
-        notifList.add(new NotifItem("ML/AI Workshop", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
+//
+//        notifList.add(new NotifItem("ECN102 Lecture", Calendar.getInstance(), Constants.REMINDER_SET));
+//        notifList.add(new NotifItem("Subject Addition/Deletion Form Submission", Calendar.getInstance(), Constants.REMINDER_UNSET));
+//        notifList.add(new NotifItem("NSS Meeting", Calendar.getInstance(), Constants.REMINDER_SET));
+//        notifList.add(new NotifItem("ML/AI Workshop", Calendar.getInstance(), Constants.REMINDER_UNNOTICED));
 
         //Creating cursor to make query to database
         Cursor cursor = db.query(Constants.NotifEntry.TABLE_NAME, null, null,
